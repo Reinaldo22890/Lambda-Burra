@@ -12,9 +12,9 @@ data Player = Lambda | You --------Tipo de dato Player (Jugadores) Lambda/You
 compara :: Card -> Card -> Bool
 compara (Card v s) (Card v1 s1) = if pinta (s) == pinta (s1) then True else False
 
----------------FUNCION QUE AGREGA LAS CARTAS INICIALES A LAS MANOS DE LOS JUGADORES--------------------------------
+---------------FUNCION QUE AGREGA LAS CARTAS INICIALES A LAS MANOS DE LOS JUGADOR--------------------------------
 iniciar :: Int -> [Card] -> Hand -> Hand
-iniciar i (card) (H(hand)) = if i == 3 then (H(hand)) else iniciar (i+1) (tomarCarta(card)) (llenarMano (card) (H(hand)))
+iniciar i (card) (H(hand)) = if i == 7 then (H(hand)) else iniciar (i+1) (tomarCarta(card)) (llenarMano (card) (H(hand)))
 
 ---------------FUNCION QUE DEVOLVERA TRUE SI LA CARTA DE YOU ES MAYOR------------------------------------
 mayor :: Card -> Card -> Bool
@@ -42,26 +42,75 @@ cargar (x:xs) (H(y:ys)) mesa = if ((compara x mesa) == True) then do
                                       cargar (xs) (H(x:y:ys)) (mesa)
 
 
-
----------------------------------------------------------------------------------------------------------
-juego :: [Card] -> Hand -> Hand -> Card -> IO ()
-juego mazo you lambda mesa = do
- let manoY = (size you)
- let manoL = (size lambda)
- if (manoY == 0) then do
+---------------FUNCION QUE ENVIA EL MAZO INICIAL---------------------------------------------------------
+mazoInicial :: [Card] -> Int -> [Card]
+mazoInicial card i = if i == 7 then card else mazoInicial (tomarCarta(card)) (i+1) 
+---------------FUNCION QUE DEVUELVE LA CARTA QUE VA A JUGAR LAMBDA---------------------------------------
+---------------FUNCION PARA ORDENAR LAS CARTAS DE LAMBDA POR PINTA PARA DECIDIR CUAL VA A JUGAR----------
+---------------FUNCION QUE DECIDE LA CARTA QUE LAMBDA VA A DEJAR EN LA MESA-----------
+-------------------------------------------------------------------------------------------------------
+---------------FUNCION PARA JUGAR---------------------------------------------------------------
+juego :: [Card] -> Hand -> Hand -> Card -> Player -> IO ()
+juego mazo (H(x)) lambda mesa turno= do
+ let sizeManoY = (size (H(x)))
+ let sizeManoL = (size lambda)
+ let deck = mazo
+ let mYou = x
+ let mLambda = lambda
+ let table = mesa
+ let turn = turno
+ if (sizeManoY == 0) then do
  putStrLn"Felicidades¡¡!! Has ganado" 
  else do
-   if (manoL == 0) then do
+   if (sizeManoL == 0) then do
     putStrLn"Ha ganado Lambda"
     else do
-    putStrLn ""
+    putStrLn"----------------------------------------------"
+    putStrLn "**CARTA EN LA MESA**"
+    print table
+    putStrLn "----------------------------------------------"
+    putStrLn "Porfavor indique el numero de la carta que desea jugar: "
+    putStrLn "----------------------------------------------"
+    putStrLn"SU MANO: "
+    print (mYou)-----NOTA: hacer una funcion que muestre una lista de cartas mas agradables
+---NOTA: VERIFICAR SI YOU Y LAMBDA TIENEN CARTAS CON LA PINTA DE LA MESA, SINO CARGAN
+--NOTA: HACER VALIDACIONES PARA CUANDO INDIQUE UN NUMERO FUERA DE RANGO
+    cY <- getLine 
+    let cYnumber = read cY-----convertimos en entero el numero indicado por el usuario
+    let cartaJugada = (mYou !! cYnumber) 
+    if ((compara (cartaJugada) (table)) == False) then do
+        putStrLn "Carta no Aceptada, elija una carta con la pinta de la mesa."
+        putStrLn"-------------------------------------------------------------"
+        juego deck (H(mYou)) mLambda table turn
+        else do
+---NOTA:Falta pedir la carta de lambda
+        --let mYou2 = (quitarCarta (cartaJugada) (H(mYou)) (empty)) -------Eliminar la carta de la mano de You
+        --let mLambda2 = (quitarCarta (cartaLambda) (H(mLambda)) (empty))-------Eliminar carta de la mano de lambda
+        --if ((ganarTurno (cartaJugada) (cartaLambda)) == You) then do
+        --putStrLn "USTED HA GANADO EL TURNO"
+        --putStrLn ""
+        --putStrLn "Indique la Carta que desea agregar a la mesa:"
+        --nT <- getLine ----pido la carta
+        --cardT <- read nT---convierto la carta en numero
+        --newTable <- (mYou !! cardT)-----nueva carta para la mesa
+        --let mYou3 = (quitarCarta (newTable) (H(mYou2)) (empty))
+         putStrLn ""
+
+
+
+-------------------FUNCION PARA VERIFICAR QUIEN GANA EL TURNO--------------------------------
+ganarTurno :: Card -> Card -> Player
+ganarTurno you lambda = if ((valor you) > (valor lambda)) then You else Lambda
 
 
 ------------------------------------------------------PRINCIPAL------------------------------------------
 main :: IO ()
 main = do
 
-  let handYou = empty ---------Crea la mano vacia para You
-  let handLambda = empty ---------Crea una mano vacia para Lambda
-  let mazo = baraja      ---------Crea el mazo inicial
+  let handYou = (H[(baraja !! 1), (baraja !! 2), (baraja !! 3)]) ---------Crea la mano inicial para You
+  let handLambda = (H[(baraja !! 4), (baraja !! 5), (baraja !! 6)])---------Crea la mano inicial para Lambda
+  let mazo = mazoInicial (baraja) (0)     ---------Crea el mazo inicial
+  let mesa = (head baraja)
+  let turno = (You)
   putStrLn"   ************WELCOME TO LAMBDA-BURRA*************   "
+  juego mazo handYou handLambda mesa turno
