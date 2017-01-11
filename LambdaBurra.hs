@@ -4,6 +4,7 @@
 --
 --
 module LambdaBurra where
+import System.Random
 import Cards-----------------------Importando el modulo Cards que contiene la data y funciones de las cartas
 
 data Player = Lambda | You --------Tipo de dato Player (Jugadores) Lambda/You
@@ -106,6 +107,22 @@ juego mazo (H(x)) lambda mesa turno= do
 ganarTurno :: Card -> Card -> Player
 ganarTurno you lambda = if ((valor you) > (valor lambda)) then You else Lambda
 
+carta1 = Card (Numeric 1) Oro
+
+------------------------------BARAJAR-------------------
+--randomInt :: Int -> Int
+--randomInt xi = do
+  --          g0 <- newStdGen
+    --        let x = randomR (0,xi) g0 
+      --      return (fst x)
+
+tam :: [Card] -> Int
+tam x = length x
+---------- FUNCION QUE DEVUELVE UNA BARAJA ORDENADA ALEATORIAMENTE ------- 
+barajar ::  [Card] -> StdGen ->[Card]
+barajar [] g0 = []
+barajar (x) g0 | tam x == 1 = x
+barajar (x) g0 = do let gr = randomR (0,(tam x)-1) g0
 
 ------------------------------------------------------PRINCIPAL------------------------------------------
 main :: IO ()
@@ -118,3 +135,4 @@ main = do
   let turno = (You)
   putStrLn"   ************WELCOME TO LAMBDA-BURRA*************   "
   juego mazo handYou handLambda mesa turno
+
