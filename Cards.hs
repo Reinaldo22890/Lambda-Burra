@@ -2,10 +2,11 @@
 ----------------------------------------------MODULO CARDS-------------------------------------------------------
 -----------------------------------------------------------------------------------------------------------------
 ------------MODULO QUE CONTIENE EL TIPO DE DATO DE LAS CARTAS Y SUS FUNCIONES------------------------------------
+
 module Cards(baraja, empty, size, llenarMano, tomarCarta, pinta, Suit(..), valor, Value(..), Card(..), Hand(..)) where
 
 data Suit = Oro | Espadas | Bastos | Copas deriving (Eq, Show) --------Declaracion del tipo de dato suit (Oro, Espadas, Bastos,Copas)
-data Value = Numeric Int | Sota | Caballo | Rey | As deriving (Eq, Show)-----Declaracion del tipo de dato Value (Numeic Int, Sota, Caballo,Rey,As)
+data Value = Numeric Int | Sota | Caballo | Rey | As deriving (Eq, Show, Ord)-----Declaracion del tipo de dato Value (Numeic Int, Sota, Caballo,Rey,As)
 data Card = Card {value :: Value, suit :: Suit} deriving (Eq)-------Declaracion del tipo de dato Card (value and suit)
 
 instance Show Card where
