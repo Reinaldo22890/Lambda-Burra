@@ -45,9 +45,12 @@ cargar (x:xs) (H(y:ys)) mesa = if ((compara x mesa) == True) then do
 ---------------FUNCION QUE ENVIA EL MAZO INICIAL---------------------------------------------------------
 mazoInicial :: [Card] -> Int -> [Card]
 mazoInicial card i = if i == 7 then card else mazoInicial (tomarCarta(card)) (i+1) 
----------------FUNCION QUE DEVUELVE LA CARTA QUE VA A JUGAR LAMBDA---------------------------------------
----------------FUNCION PARA ORDENAR LAS CARTAS DE LAMBDA POR PINTA PARA DECIDIR CUAL VA A JUGAR----------
----------------FUNCION QUE DECIDE LA CARTA QUE LAMBDA VA A DEJAR EN LA MESA-----------
+
+---------------FUNCION QUE DEVUELVE UNA LISTA CON LAS CARTAS DE LA PINTA QUE PUEDO JUGAR------------------------------
+listaPintas :: Card -> Hand -> Hand
+listaPintas mesa (H c) = H [x | x<-c,compara mesa x]
+
+---------------FUNCION QUE DECIDE LA CARTA QUE LAMBDA VA A DEJAR EN LA MESA---------------------
 -------------------------------------------------------------------------------------------------------
 ---------------FUNCION PARA JUGAR---------------------------------------------------------------
 juego :: [Card] -> Hand -> Hand -> Card -> Player -> IO ()
@@ -72,9 +75,10 @@ juego mazo (H(x)) lambda mesa turno= do
     putStrLn "Porfavor indique el numero de la carta que desea jugar: "
     putStrLn "----------------------------------------------"
     putStrLn"SU MANO: "
-    print (mYou)-----NOTA: hacer una funcion que muestre una lista de cartas mas agradables
+    print (mYou)
+---NOTA: hacer una funcion que muestre una lista de cartas mas agradables
 ---NOTA: VERIFICAR SI YOU Y LAMBDA TIENEN CARTAS CON LA PINTA DE LA MESA, SINO CARGAN
---NOTA: HACER VALIDACIONES PARA CUANDO INDIQUE UN NUMERO FUERA DE RANGO
+---NOTA: HACER VALIDACIONES PARA CUANDO INDIQUE UN NUMERO FUERA DE RANGO
     cY <- getLine 
     let cYnumber = read cY-----convertimos en entero el numero indicado por el usuario
     let cartaJugada = (mYou !! cYnumber) 
