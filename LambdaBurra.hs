@@ -45,13 +45,34 @@ cargar (x:xs) (H(y:ys)) mesa = if ((compara x mesa) == True) then do
 
 ---------------FUNCION QUE ENVIA EL MAZO INICIAL---------------------------------------------------------
 mazoInicial :: [Card] -> Int -> [Card]
-mazoInicial card i = if i == 7 then card else mazoInicial (tomarCarta(card)) (i+1) 
+mazoInicial card i = if i == 7 then card else mazoInicial (tomarCarta(card)) (i+1)
+
+---------------FUNCION QUE ORDENA ASCENDENTEMENTE UNA LISTA DE CARTAS----------------------------------------------
+ordenar :: [Card] -> [Card]
+ordenar [] = []
+ordenar (x:xs) =
+    let menor = ordenar [a | a <- xs, (valor a) <= (valor x)]
+        mayor = ordenar [a | a <- xs, (valor a) > (valor x)]
+    in menor ++ [x] ++ mayor
 
 ---------------FUNCION QUE DEVUELVE UNA LISTA CON LAS CARTAS DE LA PINTA QUE PUEDO JUGAR------------------------------
 listaPintas :: Card -> Hand -> Hand
 listaPintas mesa (H c) = H [x | x<-c,compara mesa x]
 
----------------FUNCION QUE DECIDE LA CARTA QUE LAMBDA VA A DEJAR EN LA MESA---------------------
+---------------FUNCION QUE DECIDE LA CARTA QUE JUGARA LAMBDA CONTRA PLAYER---------------------
+tiraLambda :: Card -> Hand -> Card
+tiraLambda mesa (H(x:xs)) = if ( (valor mesa) > (valor (last (ordenar (x:xs))))) then do--si no tengo una carta mas alta que la mesa
+                            (head (ordenar (x:xs)))-- devuelvo la mas baja
+                            else do
+                             if ((valor (head (ordenar (x:xs)))) > (valor mesa)) then do--- si no devuelvo la primera mas alta que consiga
+                             (head (ordenar (x:xs)))
+                             else do
+                              tiraLambda mesa (H(ordenar xs))
+
+----------------FUNCION QUE DEVUELVE LA CARTA QUE JUGARA LAMBDA--------------------------------
+juegaLambda :: Card -> Hand -> Card
+juegaLambda mesa (H(x:xs)) = tiraLambda (mesa) (listaPintas mesa (H((x:xs))))
+
 -------------------------------------------------------------------------------------------------------
 ---------------FUNCION PARA JUGAR---------------------------------------------------------------
 juego :: [Card] -> Hand -> Hand -> Card -> Player -> IO ()
@@ -107,7 +128,7 @@ juego mazo (H(x)) lambda mesa turno= do
 ganarTurno :: Card -> Card -> Player
 ganarTurno you lambda = if ((valor you) > (valor lambda)) then You else Lambda
 
-carta1 = Card (Numeric 1) Oro
+--carta1 = Card (Numeric 1) Oro
 
 ------------------------------BARAJAR-------------------
 --randomInt :: Int -> Int
@@ -119,10 +140,10 @@ carta1 = Card (Numeric 1) Oro
 tam :: [Card] -> Int
 tam x = length x
 ---------- FUNCION QUE DEVUELVE UNA BARAJA ORDENADA ALEATORIAMENTE ------- 
-barajar ::  [Card] -> StdGen ->[Card]
-barajar [] g0 = []
-barajar (x) g0 | tam x == 1 = x
-barajar (x) g0 = do let gr = randomR (0,(tam x)-1) g0
+--barajar ::  [Card] -> StdGen ->[Card]
+--barajar [] g0 = []
+--barajar (x) g0 | tam x == 1 = x
+--barajar (x) g0 = do let gr = randomR (0,(tam x)-1) g0
 
 ------------------------------------------------------PRINCIPAL------------------------------------------
 main :: IO ()
