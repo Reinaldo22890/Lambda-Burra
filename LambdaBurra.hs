@@ -128,32 +128,34 @@ juego mazo (H(x)) lambda mesa turno= do
 ganarTurno :: Card -> Card -> Player
 ganarTurno you lambda = if ((valor you) > (valor lambda)) then You else Lambda
 
---carta1 = Card (Numeric 1) Oro
+carta1 = Card (Numeric 1) Oro
+-- return (fst x)
 
-------------------------------BARAJAR-------------------
---randomInt :: Int -> Int
---randomInt xi = do
-  --          g0 <- newStdGen
-    --        let x = randomR (0,xi) g0 
-      --      return (fst x)
 
-tam :: [Card] -> Int
-tam x = length x
 ---------- FUNCION QUE DEVUELVE UNA BARAJA ORDENADA ALEATORIAMENTE ------- 
---barajar ::  [Card] -> StdGen ->[Card]
---barajar [] g0 = []
---barajar (x) g0 | tam x == 1 = x
---barajar (x) g0 = do let gr = randomR (0,(tam x)-1) g0
+barajar :: [Card] -> StdGen ->[Card]
+barajar b g0 | length b == 0 = []
+             | otherwise = (b!!r: barajar [x | x<-b, x /= (b!!r)] gi)
+              where (r,gi) = (randomR (0,(length b)-1) g0)
 
 ------------------------------------------------------PRINCIPAL------------------------------------------
 main :: IO ()
 main = do
+
+  -- generador pseudo-aleatorio
+  newStdGen
+  g <- getStdGen
+  -- baraja aletoria a partir de la secuencias de numeros 'g' y una baraja virgen
+  let barajadas = barajar baraja g
+  putStrLn $ show barajadas
 
   let handYou = (H[(baraja !! 1), (baraja !! 2), (baraja !! 3)]) ---------Crea la mano inicial para You
   let handLambda = (H[(baraja !! 4), (baraja !! 5), (baraja !! 6)])---------Crea la mano inicial para Lambda
   let mazo = mazoInicial (baraja) (0)     ---------Crea el mazo inicial
   let mesa = (head baraja)
   let turno = (You)
+
+
   putStrLn"   ************WELCOME TO LAMBDA-BURRA*************   "
   juego mazo handYou handLambda mesa turno
 
