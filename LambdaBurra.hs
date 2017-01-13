@@ -86,8 +86,8 @@ quitardeMazo n  x  = [x !! i | i <- [n..((length x)-1)]]
 
 
 -- Determina si es la primera ronda de la partida
-primeravez :: [Card] -> Bool
-primeravez x = (length x == 25)
+primeravez :: [Card] -> Hand -> Hand -> Bool
+primeravez x (H(h1)) (H(h2))= (length x == 25) && (length h1 == 7) && (length h2 == 7)
 
 -- Devuelve el jugador contrario
 not_turn :: Player -> Player
