@@ -113,7 +113,6 @@ juegaLambda mesa h = tiraLambda mesa $ ordenar (encontrarPintas mesa h)
 mataYjuegaLambda :: Hand -> Card
 mataYjuegaLambda (H(x)) = last $ ordenar (x)
 
-
 -------------------JUEGA YOU ()()()()()()
 juegaYou :: Int -> Hand -> Card
 juegaYou i (H(x)) = ( x !! i) 
@@ -215,7 +214,6 @@ juego mazo mActual mSiguiente mesa turno = do
                putStrLn "Lambda ha Ganado"
             else do
                 juego mazo mSiguiente manoNueva  [jugada] (You)
-                putStrLn "Has Ganado" --------borrar este msj
 
 
         --mataYjuegaLambda :: Hand -> Card
