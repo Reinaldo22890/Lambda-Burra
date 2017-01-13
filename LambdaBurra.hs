@@ -109,7 +109,7 @@ juegaLambda mesa h = tiraLambda mesa $ ordenar (encontrarPintas mesa h)
 
 mataYjuegaLambda :: Hand -> Card
 mataYjuegaLambda h = mejorjugada lp []
-                   where lp = [[x|x<-h,compara p x] | p<- [Oro | Espadas | Bastos | Copas]]
+                   where lp = [[x | x<-h,compara p x] | p<- [Oro | Espadas | Bastos | Copas]]
 
 
 -------------------JUEGA YOU ()()()()()()
