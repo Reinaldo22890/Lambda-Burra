@@ -55,13 +55,16 @@ encontrarPintas :: Card -> Hand -> [Card]
 encontrarPintas mesa (H c) = [x | x<-c,compara mesa x]
 
 
---mejorjugada :: [[Card]] -> [Card] -> Card
---mejorjugada [] x = last x  
---mejorjugada [x:xs] [] = mejorjugada xs (head x)
---mejorjugada [x:xs] y | (length x > length y) = mejorjugada xs (head x) 
---mejorjugada [x:xs] y | otherwise = mejorjugada xs (head y) 
-                         
 
+mejorjugada ::[Card] -> [[Card]]->  Card
+mejorjugada y [] = last y  
+mejorjugada [] (x:xs) = mejorjugada x xs
+mejorjugada y (x:xs) = if ((length x) > (length y)) then do
+                         mejorjugada x xs
+                       else do
+                         mejorjugada y xs
+
+                         
 
 ----FUNCION QUE DECIDE LA CARTA QUE JUGARA LAMBDA CONTRA El USUARIO -------------
 ----(Recibe una lista de la misma pinta ordenada)--------
@@ -109,6 +112,7 @@ juegaLambda mesa h = tiraLambda mesa $ ordenar (encontrarPintas mesa h)
 -------------------------------------------------------------------------------
 mataYjuegaLambda :: Hand -> Card
 mataYjuegaLambda (H(x)) = last $ ordenar (x)
+
 
 -------------------JUEGA YOU ()()()()()()
 juegaYou :: Int -> Hand -> Card
