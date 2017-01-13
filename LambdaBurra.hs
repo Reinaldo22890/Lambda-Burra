@@ -57,9 +57,9 @@ encontrarPintas mesa (H c) = [x | x<-c,compara mesa x]
 
 mejorjugada :: [[Card]] -> [Card] -> Card
 mejorjugada [] x = last x  
-mejorjugada [x:xs] [] = mejorjugada xs (head x)
-mejorjugada [x:xs] y | (length x > length y) = mejorjugada xs (head x) 
-mejorjugada [x:xs] y | otherwise = mejorjugada xs (head y) 
+mejorjugada [x:xs] [] = mejorjugada [xs] (head x)
+mejorjugada [x:xs] y | (length x > length y) = mejorjugada [xs] (head x) 
+mejorjugada [x:xs] y | otherwise = mejorjugada [xs] (head y) 
                          
 
 
@@ -109,7 +109,8 @@ juegaLambda mesa h = tiraLambda mesa $ ordenar (encontrarPintas mesa h)
 
 mataYjuegaLambda :: Hand -> Card
 mataYjuegaLambda h = mejorjugada lp []
-                   where lp = [[x | x<-h,compara p x] | p<- [Oro | Espadas | Bastos | Copas]]
+            where lp = [[ x | x <-h , compara p x clr
+            ] | p<- [Oro , Espadas , Bastos , Copas]]
 
 
 -------------------JUEGA YOU ()()()()()()
