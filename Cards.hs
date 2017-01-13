@@ -58,3 +58,4 @@ valueCard value | value == As = 13
 --------------FUNCION QUE EVALUA LA PINTA DE UNA CARTA Y LA DEVUELVE-----------------------------------------------
 pinta :: Suit -> Suit
 pinta suit = suit
+ 
