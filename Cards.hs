@@ -3,7 +3,7 @@
 -----------------------------------------------------------------------------------------------------------------
 ------------MODULO QUE CONTIENE EL TIPO DE DATO DE LAS CARTAS Y SUS FUNCIONES------------------------------------
 
-module Cards(baraja, empty, size, llenarMano, tomarCarta, pinta, Suit(..), valor, Value(..), Card(..), Hand(..)) where
+module Cards(mostrarValor,mostrarPinta ,mostrarcarta,mostrarCartas,baraja, empty, size, llenarMano, tomarCarta, pinta, Suit(..), valor, Value(..), Card(..), Hand(..)) where
 
 data Suit = Oro | Espadas | Bastos | Copas deriving (Eq, Show) --------Declaracion del tipo de dato suit (Oro, Espadas, Bastos,Copas)
 data Value = Numeric Int | Sota | Caballo | Rey | As deriving (Eq, Show, Ord)-----Declaracion del tipo de dato Value (Numeic Int, Sota, Caballo,Rey,As)
@@ -58,4 +58,32 @@ valueCard value | value == As = 13
 --------------FUNCION QUE EVALUA LA PINTA DE UNA CARTA Y LA DEVUELVE-----------------------------------------------
 pinta :: Suit -> Suit
 pinta suit = suit
- 
+
+
+mostrarPinta :: Suit-> String
+mostrarPinta s
+    | s == Oro = "Oro"
+    | s == Copas = "Copa"
+    | s == Bastos = "Bastos"
+    | s == Espadas = "Espadas"
+
+--------------------------------------- Muestra el valor de una carta --------------------------------------------------
+mostrarValor :: Value -> String
+mostrarValor v
+    | v == (Numeric 2) = "2"
+    | v == (Numeric 3) = "3"
+    | v == (Numeric 4) = "4"
+    | v == (Numeric 5) = "5"
+    | v == (Numeric 6) = "6"
+    | v == (Numeric 7) = "7"
+    | v == Sota = "Sota"
+    | v == Caballo = "Caballo"
+    | v == Rey = "Rey"
+    | v == As = "As"
+
+mostrarcarta :: Card -> String
+mostrarcarta (Card v s) = (mostrarValor v)++" de ("++ (mostrarPinta s)++")"
+
+mostrarCartas :: [Card] -> Int-> String
+mostrarCartas [] _ = ""
+mostrarCartas (x:xs) i = "#"++(show i)++" | "++(mostrarcarta x)++" |     "++(mostrarCartas xs (i+1))
