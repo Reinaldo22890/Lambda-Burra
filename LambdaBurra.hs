@@ -124,38 +124,58 @@ juegaYou i (H(x)) = ( x !! i)
 juego :: [Card] -> Hand -> Hand -> [Card] -> Player -> IO ()
 juego mazo mActual mSiguiente mesa turno = do
     if (mesa /= [])then do --si existe una carta en la mesa
-        putStrLn"SIMESA"
+        putStrLn ""
+        putStrLn"SI MESA"
+        putStrLn ""
         if((encontrarPintas (head mesa) mActual) ==  []) then do -- No encontra cartas en la mano y carga
             putStrLn "NO TIENE EN LA MANO Y CARGA"
+            putStrLn ""
+            putStrLn "Su nueva mano es: "
+            putStrLn ""
             let carga = cargar mazo $ head mesa
             let nuevamano = juntarMano mActual carga
+            print nuevamano
             if (elem (head mesa) carga) then do-- te has cargado la mesa
+                if (turno == You) then  do
+                putStrLn "Usted se ha cargado la mesa, juega Lamda" else do
+                putStrLn ""
+                putStrLn "Lambda se ha cargado la mesa, juega usted!!" 
                 let nuevomazo = quitardeMazo ((length carga)-1) mazo 
                 juego mazo mSiguiente nuevamano [] (not_turn turno) 
             else do 
                 let nuevomazo = quitardeMazo (length carga) mazo
                 juego mazo nuevamano mSiguiente [] (turno) 
         else do
-            putStrLn "TIENE EN LA MANO"
+            putStrLn "MESA: "
+            print mesa
+            putStrLn ""
+            putStrLn "TIENE EN LA MANO: "
+            putStrLn ""
+            print mActual
+            putStrLn ""
             if (turno == You) then do
                 putStrLn "ingrese la carta:"
-            	cY <- getLine 
+                cY <- getLine 
                 let cYnumber = read cY
                 let jugada = (juegaYou (cYnumber - 1) mActual)
                 putStr "USTED HA JUGADO: "
                 print jugada
-                let manoNueva = quitardeMano  jugada mActual
-                if (manoNueva==empty) then do
-                   putStrLn "Has Ganado"
-                else
-                    if (primeravez mazo) then do
+                if ((compara  (head mesa)  jugada) == False) then do
+                putStrLn "Carta no valida, juegue una carta con la pinta de la mesa."
+                juego mazo mActual mSiguiente mesa turno
+                else do
+                  let manoNueva = quitardeMano  jugada mActual
+                  if (manoNueva==empty) then do
+                    putStrLn "Has Ganado"
+                  else
+                    if (primeravez mazo mActual mSiguiente) then do
                         juego mazo mSiguiente manoNueva [jugada] (Lambda)
                     else do
                         if (mayor jugada (head mesa))then do
                             juego mazo manoNueva mSiguiente [] (You)
                         else do
                             juego mazo mSiguiente manoNueva [] (Lambda)
-            else do
+            else do ----Turno de lambda
                 let jugada = juegaLambda (head mesa) mActual
                 putStr "LAMBDA HA JUGADO: "
                 print jugada
@@ -170,7 +190,10 @@ juego mazo mActual mSiguiente mesa turno = do
                         juego mazo mSiguiente manoNueva [] (You)
     else do  -- sino hay carta en mesa
         if (turno == You) then do
-            let jugada = mataYjuegaYou mActual
+            putStrLn "ingrese la carta:"
+            cY <- getLine 
+            let cYnumber = read cY
+            let jugada = (juegaYou (cYnumber - 1) mActual)
             putStr "USTED HA JUGADO: "
             print jugada 
             let manoNueva = quitardeMano jugada mActual
@@ -179,19 +202,16 @@ juego mazo mActual mSiguiente mesa turno = do
             else do
                juego mazo manoNueva mSiguiente [jugada] (Lambda)
                putStrLn "Has Ganado"  
-        else do
-            putStrLn "ingrese la carta:"
-            cY <- getLine 
-            let cYnumber = read cY
-            let jugada = (juegaYou (cYnumber - 1) mActual)
-            putStr "USTED HA JUGADO: "
+        else do ---- Turno es igual a lambda
+            let jugada = mataYjuegaLambda mActual
+            putStr "LAMBDA HA JUGADO: "
             print jugada
             let manoNueva = quitardeMano jugada mActual
             if (manoNueva==empty) then
-               putStrLn "Has Ganado"
+               putStrLn "Lambda ha Ganado"
             else do
-                juego mazo manoNueva mSiguiente [jugada] (You)
-                putStrLn "Has Ganado"
+                juego mazo mSiguiente manoNueva  [jugada] (You)
+                putStrLn "Has Ganado" --------borrar este msj
 
 
         --mataYjuegaLambda :: Hand -> Card
