@@ -38,17 +38,6 @@ ordenar (x:xs) = let menor = ordenar [a | a <- xs, (valor a) <= (valor x)]
                      mayor = ordenar [a | a <- xs, (valor a) > (valor x)]
                  in menor ++ [x] ++ mayor
 
-
-----------------FUNCION QUE DEVUELVE LA CARTA QUE JUGARA LAMBDA--------------------------------
-juegaLambda :: Card -> Hand -> Card
-juegaLambda mesa h = tiraLambda mesa $ ordenar (encontrarPintas mesa h)
-
-
--------------------JUEGA YOU ()()()()()()
-juegaYou :: Hand -> Card
-juegaYou h = (head $ baraja)
-
-
 ---------- FUNCION QUE DEVUELVE UNA BARAJA ORDENADA ALEATORIAMENTE ------- 
 barajar :: [Card] -> StdGen ->[Card]
 barajar b g0 | length b == 0 = []
@@ -73,7 +62,7 @@ tiraLambda :: Card -> [Card] -> Card
 tiraLambda mesa (x:xs) | valor (last(x:xs)) < valor mesa = head (x:xs)
 --- como si tiene una carta  recorre la lista hasta que encuentre la primera mas alta y la devuelve 
                        | valor (head (x:xs)) > valor mesa = head (x:xs)
-                       | otherwise = tiraLambda mesa (ordenar xs)
+                       | otherwise = tiraLambda mesa (xs)
 
 
 ----Funcion que devuelve una mano sacando la carta que se le indique------------
@@ -84,6 +73,7 @@ quitardeMano c (H (x))  = ( H([y | y <- x, y /= c]))
 
 ----Funcion que devuelve un mazo sin una determinada cantidad de cartas
 quitardeMazo ::  Int -> [Card] ->  [Card] 
+quitardeMazo _ [] = []
 quitardeMazo n  x  = [x !! i | i <- [n..((length x)-1)]]
 
 
@@ -105,12 +95,25 @@ cargar (x:xs) mesa = if ((compara x mesa)) then [x] else (x:cargar xs mesa)
 juntarMano :: Hand -> [Card] -> Hand
 juntarMano (H(x)) y =  H(x ++ y)
 
+----------------FUNCION QUE DEVUELVE LA CARTA QUE JUGARA LAMBDA--------------------------------
+juegaLambda :: Card -> Hand -> Card
+juegaLambda mesa h = tiraLambda mesa $ ordenar (encontrarPintas mesa h)
+
+
+-------------------JUEGA YOU ()()()()()()
+juegaYou :: Int -> Hand -> Card
+juegaYou i (H(x)) = ( x !! i) 
+              
+                
 
 mataYjuegaLambda :: Hand -> Card
 mataYjuegaLambda x = head baraja
 
 mataYjuegaYou :: Hand -> Card
 mataYjuegaYou x = head baraja
+
+
+
 
 -------------------------------------------------------------------------------------------------------
 ---------------FUNCION QUE CONTROLA EL FLUJO DEL JUEGO---------------------------------------------------------------
@@ -119,19 +122,24 @@ juego mazo mActual mSiguiente mesa turno = do
     if (mesa /= [])then do --si existe una carta en la mesa
         putStrLn"SIMESA"
         if((encontrarPintas (head mesa) mActual) ==  []) then do -- No encontra cartas en la mano y carga
-            putStrLn "NO TIENE EN LA MANO y carga"
+            putStrLn "NO TIENE EN LA MANO Y CARGA"
             let carga = cargar mazo $ head mesa
             let nuevamano = juntarMano mActual carga
-            let nuevomazo = quitardeMazo
             if (elem (head mesa) carga) then do-- te has cargado la mesa
+                let nuevomazo = quitardeMazo ((length carga)-1) mazo 
                 juego mazo mSiguiente nuevamano [] (not_turn turno) 
             else do 
-                putStrLn "  nvccv"
+                let nuevomazo = quitardeMazo (length carga) mazo
                 juego mazo nuevamano mSiguiente [] (turno) 
         else do
             putStrLn "TIENE EN LA MANO"
             if (turno == You) then do
-                let jugada = juegaYou mActual  -- pedirle la carta a jugar
+                putStrLn "ingrese la carta:"
+            	cY <- getLine 
+                let cYnumber = read cY
+                let jugada = (juegaYou (cYnumber - 1) mActual)
+                putStr "USTED HA JUGADO: "
+                print jugada
                 let manoNueva = quitardeMano  jugada mActual
                 if (manoNueva==empty) then do
                    putStrLn "Has Ganado"
@@ -145,6 +153,8 @@ juego mazo mActual mSiguiente mesa turno = do
                             juego mazo mSiguiente manoNueva [] (Lambda)
             else do
                 let jugada = juegaLambda (head mesa) mActual
+                putStr "LAMBDA HA JUGADO: "
+                print jugada
                 let manoNueva = quitardeMano jugada mActual
                 putStrLn $ show jugada 
                 if (manoNueva==empty) then do
@@ -156,15 +166,22 @@ juego mazo mActual mSiguiente mesa turno = do
                         juego mazo mSiguiente manoNueva [] (You)
     else do  -- sino hay carta en mesa
         if (turno == You) then do
-            let jugada = mataYjuegaYou mActual 
+            let jugada = mataYjuegaYou mActual
+            putStr "USTED HA JUGADO: "
+            print jugada 
             let manoNueva = quitardeMano jugada mActual
             if (manoNueva==empty) then
                putStrLn "Has Ganado"
             else do
-                juego mazo manoNueva mSiguiente [jugada] (Lambda)
-                putStrLn "Has Ganado"  
+               juego mazo manoNueva mSiguiente [jugada] (Lambda)
+               putStrLn "Has Ganado"  
         else do
-            let jugada = mataYjuegaLambda mActual 
+            putStrLn "ingrese la carta:"
+            cY <- getLine 
+            let cYnumber = read cY
+            let jugada = (juegaYou (cYnumber - 1) mActual)
+            putStr "USTED HA JUGADO: "
+            print jugada
             let manoNueva = quitardeMano jugada mActual
             if (manoNueva==empty) then
                putStrLn "Has Ganado"
@@ -192,25 +209,28 @@ main = do
   g <- getStdGen
   -- Barajá aletoria a partir de la secuencias de numeros 'g' y una baraja virgen
   let barajadas = barajar baraja g
-  putStrLn $ show barajadas
-  let mesa = getnCard 1 barajadas
   -- muestra mesa
+  let mesa = getnCard 1 barajadas
   putStr $ "MESA: "
   putStrLn $ show mesa
+
   -- muestra cartas you
-  let handYou = H(getnCard 7 barajadas) ---Crea la mano inicial para You
+  let handYou = H(getnCard 7 $ quitardeMazo 1 barajadas) ---Crea la mano inicial para You
   putStr $ "Cartas You: "
   putStrLn $ show handYou
+
   -- muestra cartas lambda
-  let handLambda = H(getnCard 7 barajadas)---------Crea la mano inicial para Lambda
-  putStr $ "Cartas You: "
+  let handLambda = H(getnCard 7 $ quitardeMazo 8 barajadas)---------Crea la mano inicial para Lambda
+  putStr $ "Cartas Lambda: "
   putStrLn $ show handLambda
 
-  let mazo = quitardeMazo 15 barajadas --------- Mazo luego de sacar las cartas iniciales
+  let mazo = quitardeMazo 15 barajadas
   putStr $ "Cartas Restantes en el mazo: "
-  putStrLn $ show handLambda
-
+  putStrLn $ show mazo ----------- Mazo luego de sacar las cartas iniciales
+  putStr "cls"
   putStrLn"   ************WELCOME TO LAMBDA-BURRA*************   "
 
   juego mazo handYou handLambda mesa (You)
+
+
 
