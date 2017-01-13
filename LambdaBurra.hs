@@ -55,11 +55,11 @@ encontrarPintas :: Card -> Hand -> [Card]
 encontrarPintas mesa (H c) = [x | x<-c,compara mesa x]
 
 
-mejorjugada :: [[Card]] -> [Card] -> Card
-mejorjugada [] x = last x  
-mejorjugada [x:xs] [] = mejorjugada xs (head x)
-mejorjugada [x:xs] y | (length x > length y) = mejorjugada xs (head x) 
-mejorjugada [x:xs] y | otherwise = mejorjugada xs (head y) 
+--mejorjugada :: [[Card]] -> [Card] -> Card
+--mejorjugada [] x = last x  
+--mejorjugada [x:xs] [] = mejorjugada xs (head x)
+--mejorjugada [x:xs] y | (length x > length y) = mejorjugada xs (head x) 
+--mejorjugada [x:xs] y | otherwise = mejorjugada xs (head y) 
                          
 
 
@@ -106,11 +106,9 @@ juntarMano (H(x)) y =  H(x ++ y)
 ----------------FUNCION QUE DEVUELVE LA CARTA QUE JUGARA LAMBDA--------------------------------
 juegaLambda :: Card -> Hand -> Card
 juegaLambda mesa h = tiraLambda mesa $ ordenar (encontrarPintas mesa h)
-
+-------------------------------------------------------------------------------
 mataYjuegaLambda :: Hand -> Card
-mataYjuegaLambda h = mejorjugada lp []
-                   where lp = [[x | x<-h,compara p x] | p<- [Oro | Espadas | Bastos | Copas]]
-
+mataYjuegaLambda (H(x)) = last $ ordenar (x)
 
 -------------------JUEGA YOU ()()()()()()
 juegaYou :: Int -> Hand -> Card
@@ -190,6 +188,8 @@ juego mazo mActual mSiguiente mesa turno = do
                         juego mazo mSiguiente manoNueva [] (You)
     else do  -- sino hay carta en mesa
         if (turno == You) then do
+            putStrLn "Su mazo: "
+            print mActual
             putStrLn "ingrese la carta:"
             cY <- getLine 
             let cYnumber = read cY
@@ -200,7 +200,7 @@ juego mazo mActual mSiguiente mesa turno = do
             if (manoNueva==empty) then
                putStrLn "Has Ganado"
             else do
-               juego mazo manoNueva mSiguiente [jugada] (Lambda)
+               juego mazo mSiguiente manoNueva [jugada] (Lambda)
                putStrLn "Has Ganado"  
         else do ---- Turno es igual a lambda
             let jugada = mataYjuegaLambda mActual
@@ -237,19 +237,23 @@ main = do
   let mesa = getnCard 1 barajadas
   putStr $ "MESA: "
   putStrLn $ show mesa
+  putStrLn ""
 
   -- muestra cartas you
   let handYou = H(getnCard 7 $ quitardeMazo 1 barajadas) ---Crea la mano inicial para You
   putStr $ "Cartas You: "
+  putStrLn ""
   putStrLn $ show handYou
 
   -- muestra cartas lambda
   let handLambda = H(getnCard 7 $ quitardeMazo 8 barajadas)---------Crea la mano inicial para Lambda
   putStr $ "Cartas Lambda: "
+  putStrLn""
   putStrLn $ show handLambda
 
   let mazo = quitardeMazo 15 barajadas
   putStr $ "Cartas Restantes en el mazo: "
+  putStrLn""
   putStrLn $ show mazo ----------- Mazo luego de sacar las cartas iniciales
   putStr "cls"
   putStrLn"   ************WELCOME TO LAMBDA-BURRA*************   "
